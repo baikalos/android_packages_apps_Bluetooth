@@ -1,8 +1,5 @@
 // Bluetooth is in it's own namespace to allow it to be replaced with an
 // alternate implementation.
-soong_namespace {
-}
-
 // MAP API module
 
 java_library {
