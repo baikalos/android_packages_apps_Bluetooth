@@ -135,14 +135,6 @@ class A2dpCodecConfig {
             if( codecConfig == null ) continue;
             if (!codecConfig.isMandatoryCodec()) {
                 codecConfigArray[i] = null;
-            } else {
-                // Rebuild SBC selectable codec with Dual Channel (SBC HD audio)
-                codecConfigArray[i] = new BluetoothCodecConfig(
-                    BluetoothCodecConfig.SOURCE_CODEC_TYPE_SBC, mA2dpSourceCodecPrioritySbc,
-                    BluetoothCodecConfig.SAMPLE_RATE_NONE,
-                    BluetoothCodecConfig.BITS_PER_SAMPLE_NONE,
-                    BluetoothCodecConfig.CHANNEL_MODE_DUAL_CHANNEL, 0 /* codecSpecific1 */,
-                    0 /* codecSpecific2 */, 0 /* codecSpecific3 */, 0 /* codecSpecific4 */);
             }
         }
 
