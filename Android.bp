@@ -2,6 +2,9 @@
 // alternate implementation.
 // MAP API module
 
+soong_namespace {
+}
+
 java_library {
     name: "bluetooth.mapsapi",
 
