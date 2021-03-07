@@ -194,18 +194,7 @@ class A2dpCodecConfig {
         try {
             value = resources.getInteger(R.integer.a2dp_source_codec_priority_sbc);
             if( Settings.Global.getInt(resolver, Settings.Global.BAIKALOS_BT_SBC_PRIORITY, 0) == 1 ) {
-
-                int ldac_prio = resources.getInteger(R.integer.a2dp_source_codec_priority_ldac);
-                int aptx_hd_prio = resources.getInteger(R.integer.a2dp_source_codec_priority_aptx_hd);
-                if( ldac_prio == 0 && aptx_hd_prio == 0 ) {
-                    value = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST-1;
-                } else if( ldac_prio == 0 ) {
-                    value = aptx_hd_prio + 1;
-                } else if( aptx_hd_prio == 0 ) {
-                    value = ldac_prio-1;
-                } else {
-                    value = aptx_hd_prio + (ldac_prio - aptx_hd_prio)/2;
-                }
+                value = BluetoothCodecConfig.CODEC_PRIORITY_HIGHEST-1;
             }
             if( Settings.Global.getInt(resolver, Settings.Global.BAIKALOS_BT_SBC_DISABLED, 0) == 1 ) {
                 value = BluetoothCodecConfig.CODEC_PRIORITY_DISABLED;
