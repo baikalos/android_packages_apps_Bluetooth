@@ -164,6 +164,26 @@ class A2dpCodecConfig {
         mA2dpNativeInterface.setCodecConfigPreference(device, codecConfigArray);
     }
 
+    void setSbcBitrate(BluetoothDevice device, int bitrate) {
+
+        BluetoothCodecConfig[] codecConfigArray = assignCodecConfigPriorities();
+        if (codecConfigArray == null) {
+            return;
+        }
+
+        // Set the mandatory codec's priority to default, and remove the rest
+        for (int i = 0; i < BluetoothCodecConfig.SOURCE_CODEC_TYPE_MAX; i++) {
+            BluetoothCodecConfig codecConfig = codecConfigArray[i];
+            if( codecConfig != null ) {
+                if (codecConfig.isMandatoryCodec()) {
+                    codecConfigArray[i].setCodecSpecific1(bitrate);
+                }
+            }
+        }
+
+        mA2dpNativeInterface.setCodecConfigPreference(device, codecConfigArray);
+    }
+
     // Get the codec type of the highest priority of selectableCodecs and codecConfig.
     private int getPrioitizedCodecType(BluetoothCodecConfig codecConfig,
             BluetoothCodecConfig[] selectableCodecs) {

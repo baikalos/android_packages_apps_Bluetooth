@@ -47,6 +47,8 @@ import com.android.internal.annotations.GuardedBy;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.util.ArrayUtils;
 
+import com.android.internal.baikalos.BaikalSettings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -868,6 +870,30 @@ public class A2dpService extends ProfileService {
         mAdapterService.getDatabase().setA2dpOptionalCodecsEnabled(device, value);
     }
 
+    public int getSbcBitrate(BluetoothDevice device) {
+        int rate = 0;
+        try {
+            rate = BaikalSettings.getSbcBitrate(this, device);
+        }
+        catch(Exception e) {
+            Log.i(TAG, "getSbcBitrate exception:", e);
+            return 0;
+        }
+        Log.i(TAG, "getSbcBitrate:" + rate);
+        return rate;
+    }
+
+    public void setSbcBitrate(BluetoothDevice device, int value) {
+        Log.i(TAG, "setSbcBitrate :" + value);
+
+        BaikalSettings.setSbcBitrate(this, device,value);
+        mA2dpCodecConfig.setSbcBitrate(device, value);
+    }
+
+    public void updateSbcBitrate(BluetoothDevice device) {
+        setSbcBitrate(device,getSbcBitrate(device));
+    }
+
     // Handle messages from native (JNI) to Java
     void messageFromNative(A2dpStackEvent stackEvent) {
         Objects.requireNonNull(stackEvent.device,
@@ -878,8 +904,10 @@ public class A2dpService extends ProfileService {
             if (sm == null) {
                 if (stackEvent.type == A2dpStackEvent.EVENT_TYPE_CONNECTION_STATE_CHANGED) {
                     switch (stackEvent.valueInt) {
+                        case A2dpStackEvent.CONNECTION_STATE_CONNECTING: {
+                            updateSbcBitrate(device);
+                        }
                         case A2dpStackEvent.CONNECTION_STATE_CONNECTED:
-                        case A2dpStackEvent.CONNECTION_STATE_CONNECTING:
                             // Create a new state machine only when connecting to a device
                             if (!connectionAllowedCheckMaxDevices(device)) {
                                 Log.e(TAG, "Cannot connect to " + device
@@ -1095,6 +1123,10 @@ public class A2dpService extends ProfileService {
                 }
             }
         }
+
+        int bitrate = getSbcBitrate(device);
+        setSbcBitrate(device,bitrate);
+
         if (!hasMandatoryCodec) {
             // Mandatory codec(SBC) is not selectable. It could be caused by the remote device
             // select codec before native finish get codec capabilities. Stop use this codec
@@ -1379,6 +1411,22 @@ public class A2dpService extends ProfileService {
                 return;
             }
             service.setOptionalCodecsEnabled(device, value);
+        }
+
+        public int getSbcBitrate(BluetoothDevice device) {
+            A2dpService service = getService();
+            if (service == null) {
+                return BluetoothA2dp.OPTIONAL_CODECS_PREF_UNKNOWN;
+            }
+            return service.getSbcBitrate(device);
+        }
+
+        public void setSbcBitrate(BluetoothDevice device, int value) {
+            A2dpService service = getService();
+            if (service == null) {
+                return;
+            }
+            service.setSbcBitrate(device, value);
         }
     }
 
